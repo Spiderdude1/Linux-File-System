@@ -1,6 +1,7 @@
 
 public class SuperBlock {
 
+    public final int defaultInodesBlocks = 64;
     public int totalBlocks;
     public int totalInodes;
     public int freeList;
@@ -13,7 +14,14 @@ public class SuperBlock {
         totalBlocks = SysLib.bytes2int(SuperBlock, 0);
         totalInodes = SysLib.bytes2int(SuperBlock, 4); 
         freeList = SysLib.bytes2int(SuperBlock, 8);
-        if()
+        if(totalBlocks == diskSize && totalInodes > 0 && freeList >= 2) {
+            return;
+        } 
+        else
+        {
+            totalBlocks = diskSize;
+            format(defaultInodesBlocks);
+        }
     }
 
     public void sync() {
