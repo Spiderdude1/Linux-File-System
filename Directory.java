@@ -2,18 +2,18 @@ public class Directory {
       private static int maxChars = 30; // max characters of each file name 
  
       // Directory entries 
-      private int fsize[];        // each element stores a different file size. 
+      private int fsizes[];        // each element stores a different file size. 
       private char fnames[][];    // each element stores a different file name. 
  
       public Directory( int maxInumber ) { // directory constructor 
          fsizes = new int[maxInumber];     // maxInumber = max files 
          for ( int i = 0; i < maxInumber; i++ )  
-             fsize[i] = 0;                 // all file size initialized to 0 
+             fsizes[i] = 0;                 // all file size initialized to 0 
          fnames = new char[maxInumber][maxChars]; 
          String root = "/";                // entry(inode) 0 is "/" 
-         fsize[0] = root.length( );        // fsize[0] is the size of "/". 
+         fsizes[0] = root.length( );        // fsizes[0] is the size of "/". 
          root.getChars( 0, fsizes[0], fnames[0], 0 ); // fnames[0] includes "/" 
-      } 
+      }     
 
     public void bytes2directory( byte data[] ) { 
         // assumes data[] contains directory information retrieved from disk                                                      
@@ -52,10 +52,30 @@ public class Directory {
       public boolean ifree( short iNumber ) { 
          // deallocates this inumber (inode number) 
          // the corresponding file will be deleted. 
+        if(iNumber < 0 || iNumber > fsizes.length) {
+            return false;
+        }
+
+         for(int i = 0; i < maxChars; i++) {
+             fnames[iNumber][i] = 0;
+         }
+
+         fsizes[inumber] = 0;
+
+         return true;
       } 
  
       public short namei( String filename ) { 
-         // returns the inumber corresponding to this filename 
+         // returns the inumber corresponding to this filename
+        for(int i = 0; i < fsizes.length; i++) {
+            String tableEntry = new String( fnames[i], 0, fsizes[i] );   
+
+            if(filename.equals(tableEntry)) {
+                return i;
+            }
+        }
+
+        return -1;
       }
 
 
