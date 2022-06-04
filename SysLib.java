@@ -29,7 +29,7 @@ public class SysLib {
     public static int disk( ) {
 	return Kernel.interrupt( Kernel.INTERRUPT_DISK,
 				 0, 0, null );
-    }
+    a
 
     public static int cin( StringBuffer s ) {
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
