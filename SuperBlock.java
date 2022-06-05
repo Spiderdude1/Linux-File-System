@@ -42,7 +42,7 @@ public class SuperBlock {
         for(int i = 0; i < totalInodes; i++) {
             Inode inode = new Inode();
             inode.flag = 0;  // set it to unused
-            inode.disk((short) i);
+            inode.toDisk((short) i);
         }
 
         // byte array for storing the data about the next pointer

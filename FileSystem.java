@@ -1,3 +1,4 @@
+import java.util.*;
 public class FileSystem {
     private SuperBlock superblock;
     private Directory directory;
@@ -22,7 +23,7 @@ public class FileSystem {
     // sync the filesystem to the disk with superblock and directory
     void sync() {
         // update directory to the disk
-        FileTableEntry dirEntry = open ( "/", "w" );
+        FileTableEntry dirEntry = open( "/", "w" );
         byte[] dirData = directory.directory2bytes();
         write( dirEnty, dirData );
         close( dirEntry );
@@ -40,7 +41,7 @@ public class FileSystem {
         return true;
     }
 
-    FileTableEnyty open ( String filename, String mode ) {
+    FileTableEntry open ( String filename, String mode ) {
         FiletableEnytu ftEnt = fileTable.falloc( filename, mode );
         if ( mode.equals( "w" ) ) {
             if ( deallocAllBlocks ( ftEnt ) == false ) {

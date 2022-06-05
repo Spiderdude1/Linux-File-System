@@ -50,14 +50,14 @@ public class Directory {
             
             for(short i = 0; i < fsizes.length; i++) {
                 if(fsizes[i] == 0) {
-                    if(filename.length >= maxChars)
+                    if(filename.length() >= maxChars)
                     {
-                        fsizes[i] = maxChars
+                        fsizes[i] = maxChars;
                     } else {
-                        fsizes[i] = filename.length;
+                        fsizes[i] = filename.length();
                     }
 
-                    filename.getChars(0, fsizes[i], fname[i], 0);
+                    filename.getChars(0, fsizes[i], fnames[i], 0);
                     return i;
                 }
             }
@@ -75,7 +75,7 @@ public class Directory {
         //      fnames[iNumber][i] = 0;
         //  }
 
-         fsizes[inumber] = 0;
+         fsizes[iNumber] = 0;
 
          return true;
       } 
@@ -86,7 +86,7 @@ public class Directory {
             String tableEntry = new String( fnames[i], 0, fsizes[i] );   
 
             if(filename.equals(tableEntry)) {
-                return i;
+                return (short) i;
             }
         }
 
