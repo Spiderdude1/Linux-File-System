@@ -14,7 +14,8 @@ public class FileTable {
          // allocate/retrieve and register the corresponding inode using dir 
          // increment this inode's count 
          // immediately write back this inode to the disk 
-         // return a reference to this file (structure) table entry 
+         // return a reference to this file (structure) table entry
+          
       } 
  
       public synchronized boolean ffree( FileTableEntry e ) { 
