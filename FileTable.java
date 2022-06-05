@@ -82,7 +82,6 @@ public class FileTable {
             e.inode.count -= 1;
             e.inode.toDisk(e.iNumber);
             e.inode.flag = 0;
-            e = null;
             notify();
             return true;
 
