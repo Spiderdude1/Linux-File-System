@@ -47,6 +47,21 @@ public class Directory {
       public short ialloc( String filename ) { 
          // filename is the one of a file to be created. 
          // allocates a new inode number for this filename 
+            
+            for(short i = 0; i < fsizes.length; i++) {
+                if(fsizes[i] == 0) {
+                    if(filename.length >= maxChars)
+                    {
+                        fsizes[i] = maxChars
+                    } else {
+                        fsizes[i] = filename.length;
+                    }
+
+                    filename.getChars(0, fsizes[i], fname[i], 0);
+                    return i;
+                }
+            }
+            return -1;
       } 
  
       public boolean ifree( short iNumber ) { 
