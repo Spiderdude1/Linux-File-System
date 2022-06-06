@@ -84,7 +84,7 @@ public class SysLib {
     public static int open(String fileName, String mode) {
         String[] inputArgs = {fileName, mode};
         return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.OPEN, 0, inputArgs);
-    }
+    }   
 
     public static int close(int fd){
         return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.CLOSE, fd, null);

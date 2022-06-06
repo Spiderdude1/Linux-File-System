@@ -170,17 +170,45 @@ public class Kernel
 		cache.flush( );
 		return OK;
 	    case OPEN:    // to be implemented in project
-		return OK;
-	    case CLOSE:   // to be implemented in project
-		return OK;
-	    case SIZE:    // to be implemented in project
-		return OK;
-	    case SEEK:    // to be implemented in project
+		
 		TCB tcb = scheduler.getMyTcb();
+		
 		if(tcb != null)
 		{
-			int[] argsVal = (int []) args;
+			String[] string = (String[]) args;
+			return tcb.getFd(fs.open(string[0], string[1]));
+		}
+		else {
+			return ERROR;
+		}
+	    case CLOSE:   // to be implemented in project
+		if((tcb = scheduler.getMyTcb()) == null) {
+			break;
+		} else {
+			FileTableEntry fte = tcb.getFtEnt(param);
+			if(fte == null || tcb.returnFd(param) != fte || fs.close(fte) == false){
+				return ERROR;
+			}
+
+			return OK;
+		}
+	    case SIZE:    // to be implemented in project
+		if((tcb = scheduler.getMyTcb()) == null) {
+			break;
+		} else 
+		{
 			FileTableEntry ft = tcb.getFtEnt(param);
+			if(ft != null) {
+				return fs.fsize(ft);
+			}
+		}
+		return ERROR;
+	    case SEEK:    // to be implemented in project
+		TCB tcb2 = scheduler.getMyTcb();
+		if(tcb2 != null)
+		{
+			int[] argsVal = (int []) args;
+			FileTableEntry ft = tcb2.getFtEnt(param);
 			if( ft == null)
 			{
 				break;
@@ -205,10 +233,10 @@ public class Kernel
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts
 	    // wake up the thread waiting for a service completion
-	    //ioQueue.dequeueAndWakeup( COND_DISK_FIN );
+	    ioQueue.dequeueAndWakeup( COND_DISK_FIN );
 
 	    // wake up the thread waiting for a request acceptance
-	    //ioQueue.dequeueAndWakeup( COND_DISK_REQ );
+	    ioQueue.dequeueAndWakeup( COND_DISK_REQ );
 
 	    return OK;
 	case INTERRUPT_IO:   // other I/O interrupts (not implemented)
