@@ -2,20 +2,20 @@ import java.util.*;
 public class FileSystem {
     private SuperBlock superblock;
     private Directory directory;
-    private FileStructureTable FileTable;
+    private FileTable FileTable;
 
     public FileSystem ( int disBlocks ) {
-        superblock = new SuperBlock ( diskBlocks );
+        superblock = new SuperBlock ( disBlocks );
         directory = new Directory ( superblock.totalInodes );
-        filltable = new FileSturctureTable ( directory );
+        FileTable = new FileTable ( directory );
         // read the "/" file from disk
-        FiletableEntry dirEnt = open ( "/", "r" );
+        FileTableEntry dirEnt = open ( "/", "r" );
         int dirSize = fsize ( dirEnt );
         if ( dirSize > 0 ) {
             // the directory has some data.
             byte[] dirData = new byte[dirSize];
-            read( dirEnt, dirDate );
-            directory.bytes2directory ( dirdata );
+            read( dirEnt, dirData );
+            directory.bytes2directory ( dirData );
         } 
         close (dirEnt);
     }
@@ -25,10 +25,10 @@ public class FileSystem {
         // update directory to the disk
         FileTableEntry dirEntry = open( "/", "w" );
         byte[] dirData = directory.directory2bytes();
-        write( dirEnty, dirData );
+        write( dirEntry, dirData );
         close( dirEntry );
         // update (sycn) superblock to disk
-        superBlock.sync();
+        superblock.sync();
     }
 
     // format the disk
@@ -36,13 +36,13 @@ public class FileSystem {
         // format superblock accroding to fCount
         superblock.format( fCount );
         // create directory. create filetable new directory.
-        directory = new Directory( superblock.inodeBlocks );
+        directory = new Directory( superblock.totalInodes );
         FileTable = new FileTable( directory );
         return true;
     }
 
     FileTableEntry open ( String filename, String mode ) {
-        FiletableEnytu ftEnt = fileTable.falloc( filename, mode );
+        FileTableEntry ftEnt = FileTable.falloc( filename, mode );
         if ( mode.equals( "w" ) ) {
             if ( deallocAllBlocks ( ftEnt ) == false ) {
                 return null;
@@ -67,7 +67,7 @@ public class FileSystem {
     // read block and set buffer size accroding to data size.
     // return the number of byes to read or false (-1);
     int read ( FileTableEntry ftEnt, byte[] buffer ) {
-        if ( ftEnt == null || ftEnt.mode.eqauls( "w" ) || ftEnt.mode.eqauls( "a" ) ){
+        if ( ftEnt == null || ftEnt.mode.equals( "w" ) || ftEnt.mode.equals( "a" ) ){
             return -1;
         }
         synchronized (ftEnt){
@@ -82,7 +82,7 @@ public class FileSystem {
                     // read the block
                     byte[] bdata = new byte[Disk.blockSize];
                     SysLib.rawread( block, bdata );
-                    int start = ftEnt.seekptr  % Disk.blockSize;
+                    int start = ftEnt.seekPtr  % Disk.blockSize;
                     // update how much to read according to filesize, block size and updated buffer size
                     int lblock = Disk.blockSize - start;
                     int lfile = fsize(ftEnt) - ftEnt.seekPtr;
@@ -141,7 +141,7 @@ public class FileSystem {
 
     // write block and set buffer size accroding to data size.
     // return the number of byes that was written or false (-1)
-    int write ( FileTable Entry ftEnt, byte[] buffer ) {
+    int write ( FileTableEntry ftEnt, byte[] buffer ) {
         if ( ftEnt == null || ftEnt.mode.equals( "r" ) ) {
             return -1;
         }
@@ -154,8 +154,8 @@ public class FileSystem {
                 int block = ftEnt.inode.findTargetBlock(ftEnt.seekPtr);
                 // find free block and assign to inode
                 while (block == -1) {
-                    int fblock = superblock.getBlock();
-                    if (!ftEnt.inode.addBlock((short)fblock)) {
+                    int fblock = superblock.getFreeBlock();
+                    if (!ftEnt.inode.registerIndexBlock((short)fblock)) {
                         superblock.returnBlock(fblock);
                         return -1;
                     }
@@ -164,7 +164,7 @@ public class FileSystem {
                 // read the block
                 byte[] bdata = new byte[Disk.blockSize];
                 SysLib.rawread( block, bdata );
-                int start = ftEnt.seekptr  % Disk.blockSize;
+                int start = ftEnt.seekPtr  % Disk.blockSize;
                 // update how much to write according to block size and updated buffer size
                 int lblock = Disk.blockSize - start;
                 int size = 0;
@@ -186,7 +186,7 @@ public class FileSystem {
 
                 // update ftEnt size
                 if ( ftEnt.seekPtr > fsize(ftEnt) ) {
-                    ftEnt.inode.lenth = entry.seekPtr;
+                    ftEnt.inode.length = ftEnt.seekPtr;
                 }    
             }
             // update inode to disk
@@ -217,7 +217,7 @@ public class FileSystem {
                 }
             }
             // free indirect blocks
-            byte[] data = ftEnt.inode.freeIndirectBlock();
+            byte[] data = ftEnt.inode.unregisterIndexBlock();
             if ( data != null ) {
                 short block = SysLib.bytes2short(data, 0);
                 while ( block != -1 ){
@@ -237,3 +237,4 @@ public class FileSystem {
         }
     }
 }
+
