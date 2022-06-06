@@ -49,6 +49,7 @@ public class Kernel
     private static Scheduler scheduler;
     private static Disk disk;
     private static Cache cache;
+	private static FileSystem fs;
 
     // Synchronized Queues
     private static SyncQueue waitQueue;  // for threads to wait for their child
@@ -82,7 +83,7 @@ public class Kernel
 		// instantiate synchronized queues
 		ioQueue = new SyncQueue( );
 		waitQueue = new SyncQueue( scheduler.getMaxThreads( ) );
-		FileSystem fs = new FileSystem(1000); // added
+		fs = new FileSystem(1000); // added
 		return OK;
 	    case EXEC:
 		return sysExec( ( String[] )args );
@@ -175,11 +176,31 @@ public class Kernel
 	    case SIZE:    // to be implemented in project
 		return OK;
 	    case SEEK:    // to be implemented in project
-		return OK;
+		TCB tcb = scheduler.getMyTcb();
+		if(tcb != null)
+		{
+			int[] argsVal = (int []) args;
+			FileTableEntry ft = tcb.getFtEnt(param);
+			if( ft == null)
+			{
+				break;
+			} else {
+				return fs.seek(ft, argsVal[0], argsVal[1]);
+			}
+		}
+		return ERROR;
 	    case FORMAT:  // to be implemented in project
+		if (fs.format(param) != true)
+		{
+			return ERROR;
+		}
 		return OK;
 	    case DELETE:  // to be implemented in project
-		return OK;
+		if(fs.delete((String) args) == true)
+		{
+			return OK;
+		}
+		return ERROR;
 	    }
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts
