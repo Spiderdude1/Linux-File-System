@@ -82,8 +82,11 @@ public class SysLib {
     }
 
     public static int open(String fileName, String mode) {
-        String[] inputArgs = {fileName, mode};
-        return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.OPEN, 0, inputArgs);
+        //String[] inputArgs = {fileName, mode};
+        String[] Args = new String[2];
+        Args[0] = fileName;
+        Args[1] = mode;
+        return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.OPEN, 0, Args);
     }   
 
     public static int close(int fd){
@@ -91,8 +94,10 @@ public class SysLib {
     }
 
     public static int seek(int fd, int offset, int whence) {
-        int[] inputArgs = {offset, whence};
-        return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.SEEK, fd, inputArgs);
+        int[] Args = new int[2];
+        Args[0] = offset;
+        Args[1] = whence;
+        return Kernel.interrupt(Kernel.INTERRUPT_SOFTWARE, Kernel.SEEK, fd, Args);
     }
 
       public static int read(int fd, byte[] buffer) {

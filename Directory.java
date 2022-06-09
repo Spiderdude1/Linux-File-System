@@ -71,9 +71,6 @@ public class Directory {
             return false;
         }
 
-        //  for(int i = 0; i < maxChars; i++) {
-        //      fnames[iNumber][i] = 0;
-        //  }
 
          fsizes[iNumber] = 0;
 
